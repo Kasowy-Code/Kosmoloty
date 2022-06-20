@@ -1,7 +1,5 @@
-import java.security.spec.KeySpec;
 import java.util.*;
-import java.io.*;
-
+import  java.time.*;
 public class Kosmoloty {
     String name;
     int speedX;
@@ -23,6 +21,7 @@ public class Kosmoloty {
     }
 
     public static void main(String[] args) {
+        Instant start = Instant.now();
         ArrayList<Kosmoloty> Participants = new ArrayList<Kosmoloty>();
         int sizeX = 0;
         int sizeY = 0;
@@ -101,9 +100,68 @@ public class Kosmoloty {
             System.out.println("klops");
         }
         else {
+            int PossiblePlaces[][] = new int[sizeX][sizeY];
+
+            for(int i = 0; i < 86400; i++) {
+                for (Kosmoloty k : Participants) {
+                    if((k.posX + k.speedX) >= sizeX) {
+                        k.posX = k.speedX - (sizeX- k.posX);
+                    }
+                    else if((k.posX + k.speedX) < 0) {
+                        k.posX = k.speedX + (sizeX+k.posX);
+                    }
+                    else{
+                        k.posX += k.speedX;
+                    }
+
+
+                    if((k.posY + k.speedY) >= sizeY) {
+                        k.posY = k.speedY - (sizeY- k.posY);
+                    }
+                    else if((k.posY + k.speedY) < 0) {
+                        k.posY = k.speedY + (sizeY+k.posY);
+                    }
+                    else {
+                        k.posY += k.speedY;
+                    }
+                    PossiblePlaces[k.posX][k.posY]++;
+                    k.distance += Math.abs(k.speedX) + Math.abs(k.speedY);
+                }
+                ArrayList<Kosmoloty> temporary = new ArrayList<>();
+                ArrayList<Kosmoloty> temp = new ArrayList<>(Participants);
+                for (Kosmoloty k : temp) {
+
+                    if(PossiblePlaces[k.posX][k.posY] > 1) {
+                        temporary.add(k);
+                        Participants.remove(k);
+                    }
+                }
+                PossiblePlaces[0][0] = 0;
+                for(Kosmoloty k : Participants) {
+                    PossiblePlaces[k.posX][k.posY] = 0;
+                }
+                for (Kosmoloty k : temporary) {
+                    PossiblePlaces[k.posX][k.posY] = 0;
+                }
+            }
+            if(Participants.size() > 0) {
+                Kosmoloty best = Participants.get(0);
+                for (Kosmoloty k : Participants) {
+                    if (k.distance > best.distance || k.name == best.name) {
+                        best = k;
+                    }
+                    else if (k.distance == best.distance && k.name != best.name) {
+                        System.out.println("remis");
+                        System.exit(0);
+                    }
+                }
+                System.out.println(best.name);
+            }
+            else {
+                System.out.println("remis");
+            }
 
         }
         System.exit(0);
-        //System.out.println("");
     }
 }
